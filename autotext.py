@@ -1,6 +1,7 @@
 from pynput import keyboard
 import colorama
 import webbrowser
+import subprocess
 
 colorama.init()
 keyboard_controller = keyboard.Controller()
@@ -70,6 +71,10 @@ WEBSITES = {
     ("-github<shift>", 7): "www.github.com",
 }
 
+PROGRAMS = {
+    ("-run vscode", 11): r"C:\Users\Ucenik 15\AppData\Local\Programs\Microsoft VS Code\Code.exe",
+}
+
 
 def delete_from_screen(r):
     for i in range(r):
@@ -134,6 +139,16 @@ def browser_module(key):
             return True
 
 
+def programs_module():
+    global MEMORY
+    for program in PROGRAMS.keys():
+        if program[0] in MEMORY:
+            subprocess.Popen(PROGRAMS[program])
+            MEMORY = ""
+            delete_from_screen(program[1])
+            break
+
+
 def on_press(key):
     global MEMORY
 
@@ -143,13 +158,16 @@ def on_press(key):
         k += ">"
 
     # Make backspace possible
-    if k == "<backspace>":
+    if k == "<space>":
+        MEMORY += " "
+    elif k == "<backspace>":
         MEMORY = MEMORY[:-1]
     else:
         MEMORY += k
     if not PAUSE:
         autotype_module()
         browser_module(k)
+        programs_module()
 
     if len(MEMORY) > 100:
         5
