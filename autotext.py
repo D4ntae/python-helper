@@ -62,6 +62,20 @@ SHORTCUTS_AUTOTYPE = {
     ("ty<ctrl_l>", 2): "Thank you"
 }
 
+WEBSITES = {
+    ("-facebook<shift>", 9): "www.facebook.com",
+    ("-youtube<shift>", 8): "www.youtube.com",
+    ("-chess<shift>", 6): "www.chess.com",
+    ("-figma<shift>", 6): "www.figma.com",
+    ("-github<shift>", 7): "www.github.com",
+}
+
+
+def delete_from_screen(r):
+    for i in range(r):
+        keyboard_controller.press(keyboard.Key.backspace)
+        keyboard_controller.release(keyboard.Key.backspace)
+
 
 def log(*args, level=1):
     to_print = ""
@@ -86,9 +100,7 @@ def autotype_module():
     for mapping in SHORTCUTS_AUTOTYPE.keys():
         if mapping[0] in MEMORY:
             keyboard_controller.release(keyboard.Key.ctrl_l)
-            for i in range(mapping[1]):
-                keyboard_controller.press(keyboard.Key.backspace)
-                keyboard_controller.release(keyboard.Key.backspace)
+            delete_from_screen(mapping[1])
             keyboard_controller.type(SHORTCUTS_AUTOTYPE[mapping])
             MEMORY = ""
             break
@@ -105,12 +117,21 @@ def browser_module(key):
             browser.open(f"https://www.google.com/search?q={query}")
             MEMORY = ""
             TO_BROWSE = ""
+            delete_from_screen(8 + len(query))
+            return True
         elif key == "<backspace>":
             TO_BROWSE = TO_BROWSE[:-1]
         elif key == "<space>":
             TO_BROWSE += " "
         else:
             TO_BROWSE += key
+
+    for site in WEBSITES.keys():
+        if site[0] in MEMORY:
+            browser.open(WEBSITES[site])
+            delete_from_screen(site[1])
+            MEMORY = ""
+            return True
 
 
 def on_press(key):
@@ -131,6 +152,7 @@ def on_press(key):
         browser_module(k)
 
     if len(MEMORY) > 100:
+        5
         MEMORY = ""
 
 
@@ -139,19 +161,13 @@ def on_release(key):
     global MEMORY
     if "quitlogging" in MEMORY:
         log("Quiting logging...")
-        for i in range(11):
-            keyboard_controller.press(keyboard.Key.backspace)
-            keyboard_controller.release(keyboard.Key.backspace)
+        delete_from_screen(11)
         return False
     elif "pauselogging" in MEMORY:
-        for i in range(12):
-            keyboard_controller.press(keyboard.Key.backspace)
-            keyboard_controller.release(keyboard.Key.backspace)
+        delete_from_screen(12)
         PAUSE = True
     elif "continuelogging" in MEMORY:
-        for i in range(15):
-            keyboard_controller.press(keyboard.Key.backspace)
-            keyboard_controller.release(keyboard.Key.backspace)
+        delete_from_screen(15)
         PAUSE = False
     elif "clearlogmem" in MEMORY:
         MEMORY = ""
